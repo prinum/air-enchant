@@ -25,7 +25,8 @@ window.onload = function() {
   game.onload = function() { // ゲームの準備が整ったらメインの処理を実行します。
     game.rootScene.backgroundColor  = '#7ecef4'; // ゲームの動作部分の背景色を設定しています。
     var airplane = new Airplane();
-    var piron = new Piron();
+    // var piron = new Piron();
+    var pirons = new Pirons();
   }
 
   game.start();
@@ -45,11 +46,11 @@ window.onload = function() {
       
       var speed = 0;
       self.addEventListener(Event.ENTER_FRAME, function() {
-        self.x += speed; // 毎フレーム、くまの座標をspeed分ずらす
+        self.x += speed;
       });
 
       game.rootScene.addEventListener(Event.TOUCH_START, function(e) {
-        if (e.x > self.x) { // if (もしも) タッチした横位置が、くまの横位置よりも右側（座標の値として大きい）だったら
+        if (e.x > self.x) {
           speed += 1;
         } else {
           speed -= 1;
@@ -66,20 +67,35 @@ window.onload = function() {
       var height = Config.Sprite[spriteName].h;
       var game = enchant.Game.instance;
       Sprite.call(self, width, height);
-      self.image = game.assets['../images/' + spriteName + '.png']; // あらかじめロードしておいた画像を適用します。
+      self.image = game.assets['../images/' + spriteName + '.png'];
       self.x = Config.Window.w / 2 - (width / 2);
       var initialY = 0;
       self.y = initialY;
 
       var speed = 5;
 
-      game.rootScene.addChild(self); // ゲームのシーンにくまを表示させます。
+      game.rootScene.addChild(self);
       game.rootScene.addEventListener(Event.ENTER_FRAME, function() {
-        self.y += speed; // 毎フレーム、くまの座標をspeed分ずらす
+        self.y += speed;
         if (self.y > Config.Window.h) {
           self.y = initialY;
         }
       });
+    }
+  });
+
+  Pirons = enchant.Class.create(Group, {
+    initialize: function() {
+      Group.call(this);
+      var leftPiron = new Piron();
+      leftPiron.x -= 60;
+      this.addChild(leftPiron);
+      var rightPiron = new Piron();
+      rightPiron.x += 60;
+      this.addChild(rightPiron);
+
+      var game = enchant.Game.instance;
+      game.rootScene.addChild(this);
     }
   });
 };
