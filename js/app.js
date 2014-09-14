@@ -24,10 +24,8 @@ window.onload = function() {
 
   game.onload = function() { // ゲームの準備が整ったらメインの処理を実行します。
     game.rootScene.backgroundColor  = '#7ecef4'; // ゲームの動作部分の背景色を設定しています。
-    // var airplane = Airplane(game, 'airplane');
     var airplane = new Airplane();
-    
-    var piron = Piron(game, 'piron')
+    var piron = new Piron();
   }
 
   game.start();
@@ -35,22 +33,23 @@ window.onload = function() {
   Airplane = enchant.Class.create(Sprite, {
     initialize: function() {
       var spriteName = 'airplane';
+      var self = this;
       var game = enchant.Game.instance;
       var width = Config.Sprite[spriteName].w;
       var height = Config.Sprite[spriteName].h;
-      Sprite.call(this, width, height);
-      this.image = game.assets['../images/' + spriteName + '.png']; // あらかじめロードしておいた画像を適用します。
-      this.x = (Config.Window.w / 2) - (width / 2);
-      this.y = Config.Window.h - height;
-      game.rootScene.addChild(this); // ゲームのシーンにくまを表示させます。
+      Sprite.call(self, width, height);
+      self.image = game.assets['../images/' + spriteName + '.png']; // あらかじめロードしておいた画像を適用します。
+      self.x = (Config.Window.w / 2) - (width / 2);
+      self.y = Config.Window.h - height;
+      game.rootScene.addChild(self); // ゲームのシーンにくまを表示させます。
       
       var speed = 0;
-      this.addEventListener(Event.ENTER_FRAME, function() {
-        this.x += speed; // 毎フレーム、くまの座標をspeed分ずらす
+      self.addEventListener(Event.ENTER_FRAME, function() {
+        self.x += speed; // 毎フレーム、くまの座標をspeed分ずらす
       });
 
       game.rootScene.addEventListener(Event.TOUCH_START, function(e) {
-        if (e.x > gameObj.x) { // if (もしも) タッチした横位置が、くまの横位置よりも右側（座標の値として大きい）だったら
+        if (e.x > self.x) { // if (もしも) タッチした横位置が、くまの横位置よりも右側（座標の値として大きい）だったら
           speed += 1;
         } else {
           speed -= 1;
@@ -59,24 +58,28 @@ window.onload = function() {
     }
   });
 
-  function Piron(game, spriteName) {
-    var width = Config.Sprite[spriteName].w;
-    var height = Config.Sprite[spriteName].h;
-    var gameObj = new Sprite(width, height);  // スプライト(操作可能な画像)を準備すると同時に、スプライトの表示される領域の大きさを設定しています。
-    this.gameObj = gameObj;
-    gameObj.image = game.assets['../images/' + spriteName + '.png']; // あらかじめロードしておいた画像を適用します。
-    gameObj.x = Config.Window.w / 2 - (width / 2);
-    var initialY = 0;
-    gameObj.y = initialY;
-    game.rootScene.addChild(gameObj); // ゲームのシーンにくまを表示させます。
-    var speed = 5;
+  Piron = enchant.Class.create(Sprite, {
+    initialize: function() {
+      var spriteName = 'piron';
+      var self = this;
+      var width = Config.Sprite[spriteName].w;
+      var height = Config.Sprite[spriteName].h;
+      var game = enchant.Game.instance;
+      Sprite.call(self, width, height);
+      self.image = game.assets['../images/' + spriteName + '.png']; // あらかじめロードしておいた画像を適用します。
+      self.x = Config.Window.w / 2 - (width / 2);
+      var initialY = 0;
+      self.y = initialY;
 
-    game.rootScene.addEventListener(Event.ENTER_FRAME, function() {
-      gameObj.y += speed; // 毎フレーム、くまの座標をspeed分ずらす
-      if (gameObj.y > Config.Window.h) {
-        gameObj.y = initialY;
-      }
-    });
-  }
+      var speed = 5;
 
+      game.rootScene.addChild(self); // ゲームのシーンにくまを表示させます。
+      game.rootScene.addEventListener(Event.ENTER_FRAME, function() {
+        self.y += speed; // 毎フレーム、くまの座標をspeed分ずらす
+        if (self.y > Config.Window.h) {
+          self.y = initialY;
+        }
+      });
+    }
+  });
 };
