@@ -69,18 +69,8 @@ window.onload = function() {
       Sprite.call(self, width, height);
       self.image = game.assets['../images/' + spriteName + '.png'];
       self.x = Config.Window.w / 2 - (width / 2);
-      var initialY = 0;
-      self.y = initialY;
-
-      var speed = 5;
 
       game.rootScene.addChild(self);
-      game.rootScene.addEventListener(Event.ENTER_FRAME, function() {
-        self.y += speed;
-        if (self.y > Config.Window.h) {
-          self.y = initialY;
-        }
-      });
     }
   });
 
@@ -94,8 +84,20 @@ window.onload = function() {
       rightPiron.x += 60;
       this.addChild(rightPiron);
 
+      var initialY = 0;
+      this.y = initialY;
+      var speed = 5;
+
       var game = enchant.Game.instance;
       game.rootScene.addChild(this);
+
+      var self = this;
+      game.rootScene.addEventListener(Event.ENTER_FRAME, function() {
+        self.y += speed;
+        if (self.y > Config.Window.h) {
+          self.y = initialY;
+        }
+      });
     }
   });
 };
