@@ -32,7 +32,7 @@ window.onload = function() {
   game.MaxPirons = 10;
   game.pironsCount = 0;
 
-  game.time = 0;
+  game.time = 0.00;
 
   game.onload = function() { // ゲームの準備が整ったらメインの処理を実行します。
     game.rootScene.backgroundColor  = '#7ecef4'; // ゲームの動作部分の背景色を設定しています。
@@ -53,13 +53,14 @@ window.onload = function() {
     game.rootScene.addChild(timeLabel);
     game.updateTimeLabel = function(deltaTime) {
       game.time += deltaTime;
-      timeLabel.text = 'time: ' + game.time;
+      var floorTime = Math.floor(game.time * 100) / 100;
+      timeLabel.text = 'time: ' + floorTime;
     };
     game.updateTimeLabel(0);
     
     var timer = setInterval(function (){
-      game.updateTimeLabel(1);
-    }, 1000);
+      game.updateTimeLabel(0.01);
+    }, 10);
 
     var airplane = new Airplane();
     setInterval(function(){
@@ -173,7 +174,7 @@ window.onload = function() {
         game.updateTimeLabel(6);
         self.subtractable = false;
         self.scorable = false;
-        game.updateScrollSpeed(-1);
+        // game.updateScrollSpeed(-1);
       };
 
       if(this.subtractable && this.leftPiron.intersect(this.airplane)) {
