@@ -25,7 +25,6 @@ window.onload = function() {
   var game = new Game(Config.Window.w, Config.Window.h); // ゲーム本体を準備すると同時に、表示される領域の大きさを設定しています。
   game.fps = 24; // frames（フレーム）per（毎）second（秒）：ゲームの進行スピードを設定しています。
   game.preload(['../images/airplane.png', '../images/piron.png']); //gゲームに使う素材をあらかじめ読み込んでおきます。
-  game.score = 0;
   
   game.minScrollSpeed = 5;
   game.scrollSpeed = game.minScrollSpeed;
@@ -37,13 +36,6 @@ window.onload = function() {
 
   game.onload = function() { // ゲームの準備が整ったらメインの処理を実行します。
     game.rootScene.backgroundColor  = '#7ecef4'; // ゲームの動作部分の背景色を設定しています。
-
-    var scoreLabel = new Label();
-    game.rootScene.addChild(scoreLabel);
-    game.updateScoreLabel = function() {
-      scoreLabel.text = 'score: ' + game.score;
-    };
-    game.updateScoreLabel();
 
     var speedLabel = new Label();
     speedLabel.y += 15;
@@ -172,18 +164,12 @@ window.onload = function() {
       }
 
       if(this.scorable && this.pointArea.intersect(this.airplane)) {
-        this.game.score += 3;
-        this.game.updateScoreLabel();
         this.scorable = false;
-
         game.updateScrollSpeed(1);
       }
 
       var self = this;
       var hitPiron = function() {
-        self.game.score -= 6;
-        self.game.updateScoreLabel();
-
         game.updateTimeLabel(6);
         self.subtractable = false;
         self.scorable = false;
