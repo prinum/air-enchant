@@ -26,8 +26,14 @@ window.onload = function() {
   game.fps = 24; // frames（フレーム）per（毎）second（秒）：ゲームの進行スピードを設定しています。
   game.preload(['../images/airplane.png', '../images/piron.png']); //gゲームに使う素材をあらかじめ読み込んでおきます。
   game.score = 0;
+  
   game.minScrollSpeed = 5;
   game.scrollSpeed = game.minScrollSpeed;
+  
+  game.MaxPirons = 10;
+  game.pironsCount = 0;
+
+  game.time = 0;
 
   game.onload = function() { // ゲームの準備が整ったらメインの処理を実行します。
     game.rootScene.backgroundColor  = '#7ecef4'; // ゲームの動作部分の背景色を設定しています。
@@ -48,11 +54,29 @@ window.onload = function() {
       }
       speedLabel.text = 'speed: ' + game.scrollSpeed;
     };
-    game.updateScrollSpeed();
+    game.updateScrollSpeed(0);
+
+    var timeLabel = new Label();
+    timeLabel.y += 30;
+    game.rootScene.addChild(timeLabel);
+    game.updateTimeLabel = function(deltaTime) {
+      game.time += deltaTime;
+      timeLabel.text = 'time: ' + game.time;
+    };
+    game.updateTimeLabel(0);
+    
+    var timer = setInterval(function (){
+      game.updateTimeLabel(1);
+    }, 1000);
 
     var airplane = new Airplane();
     setInterval(function(){
+      if (game.pironsCount >= game.MaxPirons) {
+        clearInterval(timer);
+        return;
+      }
       var pirons = new Pirons(airplane);
+      game.pironsCount += 1;
     }, 2000);
   }
 
@@ -159,6 +183,8 @@ window.onload = function() {
       var hitPiron = function() {
         self.game.score -= 6;
         self.game.updateScoreLabel();
+
+        game.updateTimeLabel(6);
         self.subtractable = false;
         self.scorable = false;
         game.updateScrollSpeed(-1);
