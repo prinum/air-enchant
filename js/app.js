@@ -25,13 +25,34 @@ window.onload = function() {
   var game = new Game(Config.Window.w, Config.Window.h); // ゲーム本体を準備すると同時に、表示される領域の大きさを設定しています。
   game.fps = 24; // frames（フレーム）per（毎）second（秒）：ゲームの進行スピードを設定しています。
   game.preload(['../images/airplane.png', '../images/piron.png']); //gゲームに使う素材をあらかじめ読み込んでおきます。
+  game.score = 0;
+  game.minScrollSpeed = 5;
+  game.scrollSpeed = game.minScrollSpeed;
 
   game.onload = function() { // ゲームの準備が整ったらメインの処理を実行します。
     game.rootScene.backgroundColor  = '#7ecef4'; // ゲームの動作部分の背景色を設定しています。
+
+    var scoreLabel = new Label();
+    game.rootScene.addChild(scoreLabel);
+    game.updateScoreLabel = function() {
+      scoreLabel.text = 'score: ' + game.score;
+    };
+    game.updateScoreLabel();
+
+    var speedLabel = new Label();
+    speedLabel.y += 15;
+    game.rootScene.addChild(speedLabel);
+    game.updateScrollSpeed = function(deltaSpeed) {
+      if (this.scrollSpeed + deltaSpeed >= this.minScrollSpeed ) {
+        this.scrollSpeed += deltaSpeed;
+      }
+      speedLabel.text = 'speed: ' + game.scrollSpeed;
+    };
+    game.updateScrollSpeed();
+
     var airplane = new Airplane();
-    // var piron = new Piron();
     setInterval(function(){
-      var pirons = new Pirons();
+      var pirons = new Pirons(airplane);
     }, 2000);
   }
 
@@ -54,9 +75,9 @@ window.onload = function() {
       var self = this;
       game.rootScene.addEventListener(Event.TOUCH_START, function(e) {
         if (e.x > self.x) {
-          self.speed += 1;
+          self.speed += 2;
         } else {
-          self.speed -= 1;
+          self.speed -= 2;
         }
       });
     },
@@ -82,9 +103,10 @@ window.onload = function() {
 
   PointArea = enchant.Class.create(Sprite, {
     initialize: function() {
-      Sprite.call(this, Config.PointArea.w, Config.PointArea.h);
+      var width = Config.PointArea.w - Config.Sprite.piron.w;
+      Sprite.call(this, width, Config.PointArea.h);
       this.backgroundColor = '#000';
-      this.x = (Config.Window.w / 2) - (Config.PointArea.w / 2);
+      this.x = (Config.Window.w / 2) - (Config.PointArea.w / 2) + (Config.Sprite.piron.w / 2);
       this.opacity = 0.5;
       var game = enchant.Game.instance;
       game.rootScene.addChild(this);
@@ -92,18 +114,24 @@ window.onload = function() {
   });
 
   Pirons = enchant.Class.create(Group, {
-    initialize: function() {
+    initialize: function(airplane) {
       Group.call(this);
-      var leftPiron = new Piron();
-      leftPiron.x -= Config.PointArea.w / 2;
-      this.addChild(leftPiron);
-
-      var rightPiron = new Piron();
-      rightPiron.x += Config.PointArea.w / 2;
-      this.addChild(rightPiron);
+      this.airplane = airplane;
       
-      var pointArea = new PointArea();
-      this.addChild(pointArea);
+      this.leftPiron = new Piron();
+      this.leftPiron.x -= Config.PointArea.w / 2;
+      this.addChild(this.leftPiron);
+
+      this.rightPiron = new Piron();
+      this.rightPiron.x += Config.PointArea.w / 2;
+      this.addChild(this.rightPiron);
+      
+      this.pointArea = new PointArea();
+      this.addChild(this.pointArea);
+
+      this.scorable = true;
+      this.subtractable = true;
+      this.game = enchant.Game.instance;
 
       function randomX() {
         return Math.random() * (Config.Window.w / 2) * randomPlusOrMinus();// TODO 調整
@@ -111,15 +139,37 @@ window.onload = function() {
       this.x = randomX();
       this.y = - Config.Sprite.piron.h;
 
-      var game = enchant.Game.instance;
-      game.rootScene.addChild(this);
+      this.game.rootScene.addChild(this);
     },
     onenterframe: function() {
-      var speed = 5;
-      this.y += speed;
+      this.y += this.game.scrollSpeed;
       if (this.y > Config.Window.h) {
-        var game = enchant.Game.instance;
-        game.rootScene.removeChild(this);
+        this.game.rootScene.removeChild(this);
+      }
+
+      if(this.scorable && this.pointArea.intersect(this.airplane)) {
+        this.game.score += 3;
+        this.game.updateScoreLabel();
+        this.scorable = false;
+
+        game.updateScrollSpeed(1);
+      }
+
+      var self = this;
+      var hitPiron = function() {
+        self.game.score -= 6;
+        self.game.updateScoreLabel();
+        self.subtractable = false;
+        self.scorable = false;
+        game.updateScrollSpeed(-1);
+      };
+
+      if(this.subtractable && this.leftPiron.intersect(this.airplane)) {
+        hitPiron();
+      }
+
+      if(this.subtractable && this.rightPiron.intersect(this.airplane)) {
+        hitPiron();
       }
     }
   });
