@@ -24,7 +24,7 @@ window.onload = function() {
 
   var game = new Game(Config.Window.w, Config.Window.h); // ゲーム本体を準備すると同時に、表示される領域の大きさを設定しています。
   game.fps = 24; // frames（フレーム）per（毎）second（秒）：ゲームの進行スピードを設定しています。
-  game.preload(['../images/airplane.png', '../images/piron.png']); //gゲームに使う素材をあらかじめ読み込んでおきます。
+  game.preload(['images/airplane.png', 'images/piron.png']); //gゲームに使う素材をあらかじめ読み込んでおきます。
   
   game.minScrollSpeed = 5;
   game.scrollSpeed = game.minScrollSpeed;
@@ -91,7 +91,7 @@ window.onload = function() {
       var width = Config.Sprite[spriteName].w;
       var height = Config.Sprite[spriteName].h;
       Sprite.call(this, width, height);
-      this.image = game.assets['../images/' + spriteName + '.png']; // あらかじめロードしておいた画像を適用します。
+      this.image = game.assets['images/' + spriteName + '.png']; // あらかじめロードしておいた画像を適用します。
       this.x = (Config.Window.w / 2) - (width / 2);
       this.y = Config.Window.h - height;
       game.rootScene.addChild(this); // ゲームのシーンにくまを表示させます。
@@ -133,7 +133,7 @@ window.onload = function() {
       var game = enchant.Game.instance;
       Sprite.call(self, width, height);
       
-      self.image = game.assets['../images/' + spriteName + '.png'];
+      self.image = game.assets['images/' + spriteName + '.png'];
       self.x = Config.Window.w / 2 - (width / 2);
       game.rootScene.addChild(self);
     }
