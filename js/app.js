@@ -65,14 +65,15 @@ window.onload = function() {
     };
     game.updateTimeLabel(0);
     
-    var timer = setInterval(function (){
+    game.timer = setInterval(function (){
       game.updateTimeLabel(0.01);
     }, 10);
 
     var airplane = new Airplane();
-    setInterval(function(){
+    game.pironTimer = setInterval(function(){
       if (game.pironsCount >= game.MaxPirons) {
-        clearInterval(timer);
+        clearInterval(game.timer);
+        clearInterval(game.pironTimer);
         return;
       }
       var pirons = new Pirons(airplane);
@@ -168,6 +169,7 @@ window.onload = function() {
 
       this.scorable = true;
       this.subtractable = true;
+      this.hitted = false;
       this.game = enchant.Game.instance;
 
       function randomX() {
@@ -181,11 +183,16 @@ window.onload = function() {
     onenterframe: function() {
       this.y += this.game.scrollSpeed;
       if (this.y > Config.Window.h) {
+        if (!this.hitted) { // airplaneがPironとPointAreaに当たらなかったとき
+          clearInterval(this.game.timer);
+          clearInterval(this.game.pironTimer);
+        }
         this.game.rootScene.removeChild(this);
       }
 
       if(this.scorable && this.pointArea.intersect(this.airplane)) {
         this.scorable = false;
+        this.hitted = true;
         game.updateScrollSpeed(1);
       }
 
@@ -194,6 +201,7 @@ window.onload = function() {
         game.updateTimeLabel(6);
         self.subtractable = false;
         self.scorable = false;
+        this.hitted = true;
         // game.updateScrollSpeed(-1);
       };
 
