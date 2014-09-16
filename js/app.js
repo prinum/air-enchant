@@ -37,6 +37,13 @@ window.onload = function() {
   game.onload = function() { // ゲームの準備が整ったらメインの処理を実行します。
     game.rootScene.backgroundColor  = '#7ecef4'; // ゲームの動作部分の背景色を設定しています。
 
+    var pironsLabel = new Label();
+    game.rootScene.addChild(pironsLabel);
+    game.updatePironsLabel = function() {
+      pironsLabel.text = 'piron: ' + game.pironsCount + '/' + game.MaxPirons;
+    };
+    game.updatePironsLabel();
+
     var speedLabel = new Label();
     speedLabel.y += 15;
     game.rootScene.addChild(speedLabel);
@@ -70,6 +77,7 @@ window.onload = function() {
       }
       var pirons = new Pirons(airplane);
       game.pironsCount += 1;
+      game.updatePironsLabel();
     }, 2000);
   }
 
@@ -99,7 +107,19 @@ window.onload = function() {
       });
     },
     onenterframe: function() {
-        this.x += this.speed;
+      if (this.x <= 0) {
+        console.log('hi this.x <= 0');
+        this.x += 1;//壁にぶつかった時に少しずらす必要ある
+        this.speed = 0;
+        return;
+      }
+      if (this.x >= (Config.Window.w - Config.Sprite.airplane.w)) {
+        console.log('hi');
+        this.x -= 1;//壁にぶつかった時に少しずらす必要ある
+        this.speed = 0;
+        return;
+      }
+      this.x += this.speed;
     }
   });
 
